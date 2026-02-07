@@ -715,12 +715,32 @@
                 const cmd = terminalInput.value;
                 if (!cmd) return;
 
+                const codeContext = editor.innerText;
+                const lang = document.getElementById('lang-select').value;
+                const activeFile = document.getElementById('active-tab').innerText.split(' ')[0];
+
                 addTerminalLine(`<span class="prompt">➜</span> ${cmd}`);
                 terminalInput.value = '';
                 updateBrainPower(5);
 
                 setTimeout(() => {
-                    let response = "That's a great direction. How would you explain that to someone who has never seen a computer before? Use a real-world analogy.";
+                    let response = "";
+                    const lowerCmd = cmd.toLowerCase();
+
+                    if (lowerCmd.includes('help') || lowerCmd.includes('stuck')) {
+                        response = `I see you're working in <b>${activeFile}</b>. Looking at your logic, you've started with some core structures. If you had to explain the main goal of this ${lang.toUpperCase()} code using only basic tools like a calculator or a scale, how would it work?`;
+                    } else if (lowerCmd.includes('explain') || lowerCmd.includes('how')) {
+                        if (codeContext.includes('function')) {
+                            response = "Functions are like machines in a factory. You put something in (input), and something else comes out (output). What are the 'raw materials' your current function is expecting?";
+                        } else {
+                            response = "Think of your logic like a recipe. If we don't define the ingredients first, the oven doesn't know what to bake. What is the very first piece of data your code needs to handle?";
+                        }
+                    } else if (lowerCmd.includes('error') || lowerCmd.includes('debug')) {
+                        response = "Errors are just the computer's way of saying 'I don't understand this specific step.' Look at your most recent line. If you were the computer, what would be the most confusing part of that instruction?";
+                    } else {
+                        response = `That's a solid thought. Integrating that into your <b>${lang.toUpperCase()}</b> logic: How does this step move us closer to the final output without using a pre-made library?`;
+                    }
+
                     addTerminalLine(response, true);
                 }, 1000);
             }
