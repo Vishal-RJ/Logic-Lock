@@ -94,6 +94,38 @@
             gap: 16px;
         }
 
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .new-file-btn {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            border-radius: 4px;
+            width: 20px;
+            height: 20px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lang-select {
+            background: var(--bg-editor);
+            color: var(--text-dim);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 10px;
+            padding: 2px 4px;
+            outline: none;
+            cursor: pointer;
+        }
+
         .section-label {
             font-size: 10px;
             text-transform: uppercase;
@@ -159,6 +191,12 @@
             border-right: 1px solid var(--border);
             background: var(--bg-editor);
             color: var(--text-dim);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.02);
         }
 
         .editor-content {
@@ -372,19 +410,33 @@
     <div class="main-layout">
         <!-- Sidebar: Files -->
         <aside class="sidebar">
-            <div class="section-label">Explorer</div>
-            <ul class="file-list">
+            <div class="sidebar-header">
+                <div class="section-label">Explorer</div>
+                <button class="new-file-btn" onclick="createNewFile()" title="New File">+</button>
+            </div>
+
+            <div style="margin-top: 8px;">
+                <div class="section-label" style="font-size: 8px; margin-bottom: 4px;">Language</div>
+                <select class="lang-select" id="lang-select" onchange="handleLangChange()">
+                    <option value="js">JavaScript (.js)</option>
+                    <option value="ts">TypeScript (.ts)</option>
+                    <option value="py">Python (.py)</option>
+                    <option value="cpp">C++ (.cpp)</option>
+                    <option value="html">HTML (.html)</option>
+                </select>
+            </div>
+
+            <ul class="file-list" id="file-list" style="margin-top: 10px;">
                 <li class="file-item active" onclick="selectFile('main.js')">📄 main.js</li>
                 <li class="file-item" onclick="selectFile('logic.ts')">ts logic.ts</li>
                 <li class="file-item" onclick="selectFile('styles.css')"># styles.css</li>
-                <li class="file-item" onclick="selectFile('package.json')">{ } package.json</li>
             </ul>
         </aside>
 
         <!-- Editor: Top Center -->
         <section class="editor-container">
             <div class="tabs-bar">
-                <div class="tab">main.js ✕</div>
+                <div class="tab" id="active-tab" ondblclick="renameActiveFile()">main.js ✕</div>
             </div>
             <div class="editor-content" id="editor" contenteditable="true" onpaste="handlePaste(event)">
                 <span style="color:#6366f1">function</span> <span style="color:#38bdf8">initCoreModule</span>() {
@@ -506,6 +558,72 @@
                     terminalInput.focus();
                 }, 800);
             }
+        }
+
+        function handleLangChange() {
+            const lang = document.getElementById('lang-select').value;
+            const tab = document.getElementById('active-tab');
+            const currentName = tab.textContent.split(' ')[0];
+            const nameWithoutExt = currentName.split('.')[0];
+
+            const newName = `${nameWithoutExt}.${lang}`;
+            tab.innerHTML = `${newName} ✕`;
+
+            // Update active file in list
+            const activeFileItem = document.querySelector('.file-item.active');
+            if (activeFileItem) {
+                activeFileItem.innerHTML = `📄 ${newName}`;
+                activeFileItem.setAttribute('onclick', `selectFile('${newName}')`);
+            }
+
+            addTerminalLine(`[System] Environment synced. Language set to: ${lang.toUpperCase()}`);
+        }
+
+        function createNewFile() {
+            const name = prompt("Enter file name:", "untitled");
+            if (name) {
+                const lang = document.getElementById('lang-select').value;
+                const fullName = name.includes('.') ? name : `${name}.${lang}`;
+
+                const list = document.getElementById('file-list');
+                const li = document.createElement('li');
+                li.className = 'file-item';
+                li.innerHTML = `📄 ${fullName}`;
+                li.onclick = function () { selectFile(fullName); };
+                list.appendChild(li);
+
+                selectFile(fullName);
+                addTerminalLine(`[System] Created new file: ${fullName}`);
+            }
+        }
+
+        function renameActiveFile() {
+            const tab = document.getElementById('active-tab');
+            const oldName = tab.textContent.split(' ')[0];
+            const newName = prompt("Rename file to:", oldName);
+
+            if (newName && newName !== oldName) {
+                tab.innerHTML = `${newName} ✕`;
+                const activeFileItem = document.querySelector('.file-item.active');
+                if (activeFileItem) {
+                    activeFileItem.innerHTML = `📄 ${newName}`;
+                }
+                addTerminalLine(`[System] Renamed file to: ${newName}`);
+            }
+        }
+
+        function selectFile(name) {
+            const items = document.querySelectorAll('.file-item');
+            items.forEach(i => i.classList.remove('active'));
+
+            // Find and activate the item in the list
+            const allItems = document.querySelectorAll('.file-item');
+            allItems.forEach(item => {
+                if (item.textContent.includes(name)) item.classList.add('active');
+            });
+
+            document.getElementById('active-tab').innerHTML = `${name} ✕`;
+            addTerminalLine(`[System] Switched to editor: ${name}`);
         }
 
         function handleCommand(e) {
