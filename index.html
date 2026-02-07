@@ -419,31 +419,43 @@
 
         <!-- Lessons: Right Side -->
         <aside class="lessons-panel">
-            <div class="section-label">Learning Modules</div>
+            <div class="section-label">Coding Training Modules</div>
 
-            <div class="lesson-card">
-                <h4>Binary Logic Mastery</h4>
-                <p>Learn to divide and conquer algorithms without copying from StackOverflow.</p>
-                <div class="status-badge">Phase 1: In Progress</div>
+            <div class="lesson-card clickable"
+                onclick="loadLesson('Binary Logic', 'Binary Search helps you find elements in a sorted array by dividing work in half. Try implementing it in main.js.')">
+                <h4>1. Binary Logic Mastery</h4>
+                <p>Divide and conquer algorithms without copying code.</p>
+                <div class="status-badge" id="binary-status">Ready</div>
             </div>
 
-            <div class="lesson-card">
-                <h4>Recursive Thinking</h4>
-                <p>Master self-calling functions through visual analogies, not templates.</p>
-                <div style="font-size: 10px; color: var(--text-dim); margin-top: 10px;">LOCKED - Complete Phase 1</div>
+            <div class="lesson-card clickable"
+                onclick="loadLesson('Recursive Thinking', 'Recursion is a function calling itself. Master it through visual analogies, not templates.')">
+                <h4>2. Recursive Thinking</h4>
+                <p>Learn the 'Descending Ladder' approach to functions.</p>
+                <div class="status-badge" style="background: rgba(251, 191, 36, 0.2); color: #fbbf24;">In Progress</div>
+            </div>
+
+            <div class="lesson-card clickable"
+                onclick="loadLesson('Data Structures', 'Learn why Arrays and Objects are like Drawers and Maps.')">
+                <h4>3. Data Structures v1</h4>
+                <p>Visualizing data storage for better logic.</p>
+                <div class="status-badge" style="background: rgba(148, 163, 184, 0.2); color: #94a3b8;">Locked</div>
             </div>
 
             <div style="flex:1"></div>
 
-            <div class="section-label">Session Stats</div>
+            <div class="section-label">Socratic Session Stats</div>
             <div style="font-size: 12px; margin-top: 10px;">
                 <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                    <span>Brain Power</span>
-                    <span style="color: var(--accent);">84%</span>
+                    <span>Brain Power (Originality)</span>
+                    <span id="brain-power" style="color: var(--accent);">0%</span>
                 </div>
                 <div style="height:4px; background:rgba(255,255,255,0.05); border-radius:2px;">
-                    <div style="width:84%; height:100%; background: var(--accent);"></div>
+                    <div id="brain-bar"
+                        style="width:0%; height:100%; background: var(--accent); transition: width 0.5s;"></div>
                 </div>
+                <p style="font-size: 10px; color: var(--text-dim); margin-top: 8px;">*Originality decreases when copying
+                    from external sources.</p>
             </div>
         </aside>
     </div>
@@ -452,6 +464,19 @@
         const terminalOutput = document.getElementById('terminal-output');
         const terminalInput = document.getElementById('terminal-input');
         const editor = document.getElementById('editor');
+        const brainPowerVal = document.getElementById('brain-power');
+        const brainBar = document.getElementById('brain-bar');
+
+        let currentBrainPower = 100;
+
+        function updateBrainPower(change) {
+            currentBrainPower = Math.max(0, Math.min(100, currentBrainPower + change));
+            brainPowerVal.textContent = `${currentBrainPower}%`;
+            brainBar.style.width = `${currentBrainPower}%`;
+        }
+
+        // Initialize
+        updateBrainPower(0);
 
         function addTerminalLine(text, isAi = false) {
             const div = document.createElement('div');
@@ -459,7 +484,7 @@
                 div.className = 'ai-response-box';
                 div.innerHTML = text;
             } else {
-                div.textContent = text;
+                div.innerHTML = text;
             }
             terminalOutput.appendChild(div);
             terminalOutput.scrollTop = terminalOutput.scrollHeight;
@@ -470,21 +495,16 @@
             const text = e.clipboardData.getData('text');
 
             if (text.length > 50 || text.split('\n').length > 3) {
-                addTerminalLine(`[LogicLock] 🚨 HIGH-VELOCITY PASTE DETECTED! Blocking injection...`);
+                updateBrainPower(-20);
+                addTerminalLine(`<span style="color:#ef4444">[LogicLock] 🚨 HIGH-VELOCITY PASTE DETECTED!</span> Blocked the injection to protect your learning.`);
                 setTimeout(() => {
                     addTerminalLine(`
-                        "I see you're trying to inject a large block of logic. Let's step back. 
-                        Think of code like a custom-built house. If you just drop a pre-made room 
-                        into your frame, the pipes won't match. What is the very first 'doorway' 
-                        your logic needs to open?"
+                        "I noticed you're trying to inject a large block of code. Instead of shortcuts, let's think: 
+                        If you're building a tower, do you drop a pre-made floor or place each brick to understand 
+                        the weight? What is the first 'brick' of your logic here?"
                     `, true);
                     terminalInput.focus();
                 }, 800);
-            } else {
-                // If it's small, allow it for demo purposes
-                const selection = window.getSelection();
-                if (!selection.rangeCount) return false;
-                selection.getRangeAt(0).insertNode(document.createTextNode(text));
             }
         }
 
@@ -493,19 +513,12 @@
                 const cmd = terminalInput.value;
                 if (!cmd) return;
 
-                addTerminalLine(`➜ ${cmd}`);
+                addTerminalLine(`<span class="prompt">➜</span> ${cmd}`);
                 terminalInput.value = '';
+                updateBrainPower(5);
 
-                // Simulate Socratic AI Response
                 setTimeout(() => {
-                    let response = "";
-                    if (cmd.toLowerCase().includes('search') || cmd.toLowerCase().includes('door')) {
-                        response = "That's exactly it! Now, if you have 10 doors and you know the target is behind a door with a higher number than #5, do you still need to check #1? How does that simplify your life?";
-                    } else if (cmd.toLowerCase().includes('why') || cmd.toLowerCase().includes('how')) {
-                        response = "Great question. Think about gravity. We don't need to know the math to feel the pull. In logic, what is the 'pull' that brings your data from input to output?";
-                    } else {
-                        response = "I like that approach. If we translate that into 'plain English' instructions for a robot that only knows how to count, how would we start?";
-                    }
+                    let response = "That's a great direction. How would you explain that to someone who has never seen a computer before? Use a real-world analogy.";
                     addTerminalLine(response, true);
                 }, 1000);
             }
@@ -514,12 +527,9 @@
         function handleRun() {
             addTerminalLine(`[System] Initializing execution for main.js...`);
             setTimeout(() => {
-                addTerminalLine(`[System] Executing build artifacts...`);
-                setTimeout(() => {
-                    addTerminalLine(`[Output] Hello from LogicLock IDE! Socratic Session is active.`);
-                    addTerminalLine(`[LogicLock] 🔒 Analysis: Your code logic is 100% original. Good work.`, true);
-                }, 1000);
-            }, 500);
+                addTerminalLine(`[Output] Hello from LogicLock IDE! Socratic Session is active.`);
+                addTerminalLine(`[LogicLock] 🔒 Analysis: Logic originality is at ${currentBrainPower}%.`, true);
+            }, 800);
         }
 
         function handleDebug() {
