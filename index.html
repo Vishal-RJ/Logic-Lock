@@ -44,6 +44,17 @@
         }
 
         /* Top Bar */
+        .top-nav {
+            height: var(--header-height);
+            background: var(--bg-sidebar);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            justify-content: space-between;
+            z-index: 100;
+        }
+
         .menu-items {
             display: flex;
             gap: 15px;
@@ -250,6 +261,13 @@
             padding: 16px;
             margin-top: 12px;
             border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .lesson-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-2px);
         }
 
         .lesson-card h4 {
@@ -385,6 +403,70 @@
         ::-webkit-scrollbar-thumb:hover {
             background: var(--accent);
         }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background-color: var(--bg-sidebar);
+            margin: 10% auto;
+            padding: 0;
+            border: 1px solid var(--accent);
+            width: 500px;
+            border-radius: 12px;
+            box-shadow: 0 0 30px var(--accent-glow);
+            animation: modalSlide 0.3s ease-out;
+        }
+
+        @keyframes modalSlide {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+        }
+
+        .modal-body {
+            padding: 20px;
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        .close-modal {
+            color: var(--text-dim);
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-modal:hover {
+            color: var(--accent);
+        }
     </style>
 </head>
 
@@ -393,19 +475,26 @@
     <nav class="top-nav">
         <div class="logo">🔒 Logic<span>Lock IDE</span></div>
         <div class="menu-items">
-            <div class="menu-item">File</div>
-            <div class="menu-item">Edit</div>
-            <div class="menu-item">Selection</div>
-            <div class="menu-item">View</div>
-            <div class="menu-item">Go</div>
-            <div class="menu-item" onclick="handleRun()" style="color: #10b981; font-weight: 600;">▶ Run</div>
-            <div class="menu-item" onclick="handleDebug()" style="color: #fbbf24;">🐞 Debug</div>
-            <div class="menu-item" onclick="handleBuild()">🛠️ Build</div>
-            <div class="menu-item">Help</div>
+            <div class="menu-item" onclick="handleRun()" style="color: #10b981; font-weight: 600; font-size: 13px;">▶
+                Run</div>
+            <div class="menu-item" onclick="handleDebug()" style="color: #fbbf24; font-size: 13px;">🐞 Debug</div>
         </div>
         <div id="connection-status" class="status-badge"
             style="background: rgba(56,189,248,0.2); color: var(--accent);">CONNECTED TO GEMINI</div>
     </nav>
+
+    <!-- Run Output Modal -->
+    <div id="run-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span style="color: #10b981;">▶ Execution Result</span>
+                <span class="close-modal" onclick="closeModal()">&times;</span>
+            </div>
+            <div id="modal-body" class="modal-body">
+                <!-- Output text goes here -->
+            </div>
+        </div>
+    </div>
 
     <div class="main-layout">
         <!-- Sidebar: Files -->
@@ -500,11 +589,11 @@
             <div style="font-size: 12px; margin-top: 10px;">
                 <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
                     <span>Brain Power (Originality)</span>
-                    <span id="brain-power" style="color: var(--accent);">0%</span>
+                    <span id="brain-power" style="color: var(--accent);">100%</span>
                 </div>
                 <div style="height:4px; background:rgba(255,255,255,0.05); border-radius:2px;">
                     <div id="brain-bar"
-                        style="width:0%; height:100%; background: var(--accent); transition: width 0.5s;"></div>
+                        style="width:100%; height:100%; background: var(--accent); transition: width 0.5s;"></div>
                 </div>
                 <p style="font-size: 10px; color: var(--text-dim); margin-top: 8px;">*Originality decreases when copying
                     from external sources.</p>
@@ -526,9 +615,6 @@
             brainPowerVal.textContent = `${currentBrainPower}%`;
             brainBar.style.width = `${currentBrainPower}%`;
         }
-
-        // Initialize
-        updateBrainPower(0);
 
         function addTerminalLine(text, isAi = false) {
             const div = document.createElement('div');
@@ -569,7 +655,6 @@
             const newName = `${nameWithoutExt}.${lang}`;
             tab.innerHTML = `${newName} ✕`;
 
-            // Update active file in list
             const activeFileItem = document.querySelector('.file-item.active');
             if (activeFileItem) {
                 activeFileItem.innerHTML = `📄 ${newName}`;
@@ -616,7 +701,6 @@
             const items = document.querySelectorAll('.file-item');
             items.forEach(i => i.classList.remove('active'));
 
-            // Find and activate the item in the list
             const allItems = document.querySelectorAll('.file-item');
             allItems.forEach(item => {
                 if (item.textContent.includes(name)) item.classList.add('active');
@@ -643,25 +727,50 @@
         }
 
         function handleRun() {
-            addTerminalLine(`[System] Initializing execution for main.js...`);
+            const modal = document.getElementById('run-modal');
+            const body = document.getElementById('modal-body');
+            modal.style.display = 'block';
+            body.innerHTML = `<div style="color:var(--text-dim)">[System] Compiling...</div><div class="cursor"></div>`;
+
             setTimeout(() => {
-                addTerminalLine(`[Output] Hello from LogicLock IDE! Socratic Session is active.`);
-                addTerminalLine(`[LogicLock] 🔒 Analysis: Logic originality is at ${currentBrainPower}%.`, true);
-            }, 800);
+                body.innerHTML = `
+                    <div style="color:#10b981; margin-bottom:10px;">> Execution Successful</div>
+                    <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:4px; border-left:4px solid var(--accent);">
+                        Hello from LogicLock IDE!<br><br>
+                        Socratic Session: ACTIVE<br>
+                        Brain Power: ${currentBrainPower}%<br>
+                        Analysis: Your logic structure is verified.
+                    </div>
+                `;
+                addTerminalLine(`[System] Executed successfully. Results shown in popup.`, true);
+            }, 1000);
+        }
+
+        function closeModal() {
+            document.getElementById('run-modal').style.display = 'none';
+        }
+
+        window.onclick = function (event) {
+            const modal = document.getElementById('run-modal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
         }
 
         function handleDebug() {
-            addTerminalLine(`[Debug] Launching debugger on port 9229...`);
-            addTerminalLine(`[Debug] Breakpoint hit at main.js:14`);
-            addTerminalLine(`[Coach] I see you're stepping through the code. Instead of just looking at the variable value, think: what event *caused* that number to change?`, true);
+            addTerminalLine(`[Debug] Breakpoint hit. Inspecting logic stack...`);
+            addTerminalLine(`[Coach] I see a loop here. Instead of checking the result, tell me: what is the condition that makes this loop stop?`, true);
         }
 
-        function handleBuild() {
-            addTerminalLine(`[Build] Compiling TypeScript components...`);
+        function loadLesson(title, content) {
+            addTerminalLine(`[System] Loading Module: ${title}...`);
             setTimeout(() => {
-                addTerminalLine(`[Build] LogicLock: Pre-processing paste-velocity guards...`);
-                addTerminalLine(`[Build] Build SUCCESSFUL. ⚡`);
-            }, 1200);
+                addTerminalLine(`
+                    <strong>NEW MODULE LOADED: ${title}</strong><br>
+                    ${content}<br><br>
+                    Goal: Write the logic in main.js. Avoid pasting!
+                `, true);
+            }, 500);
         }
     </script>
 </body>
