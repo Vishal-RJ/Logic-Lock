@@ -4,407 +4,289 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LogicLock IDE | Socratic Learning Environment</title>
+    <title>LogicLock AI | Socratic Logic Coach</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Outfit:wght@300;400;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <style>
         :root {
-            --bg-deep: #020617;
-            --bg-sidebar: #0f172a;
-            --bg-editor: #1e293b;
-            --bg-terminal: #000000;
-            --accent: #38bdf8;
-            --accent-glow: rgba(56, 189, 248, 0.3);
-            --text-main: #f8fafc;
-            --text-dim: #94a3b8;
-            --border: rgba(255, 255, 255, 0.08);
-            --header-height: 40px;
-            --sidebar-width: 200px;
-            --lesson-width: 300px;
-            --terminal-height: 250px;
+            --bg-main: #131314;
+            --bg-sidebar: #1e1f20;
+            --bg-card: #28292a;
+            --accent: #8ab4f8;
+            --text-main: #e3e3e3;
+            --text-dim: #b4b7bb;
+            --border: rgba(255, 255, 255, 0.1);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
         }
 
         body {
-            font-family: 'Outfit', sans-serif;
-            background: var(--bg-deep);
+            background-color: var(--bg-main);
             color: var(--text-main);
             height: 100vh;
+            display: flex;
             overflow: hidden;
+        }
+
+        /* Sidebar */
+        aside {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            padding: 20px;
             display: flex;
             flex-direction: column;
+            gap: 20px;
+            border-right: 1px solid var(--border);
         }
 
-        /* Top Bar */
-        .top-nav {
-            height: var(--header-height);
-            background: var(--bg-sidebar);
-            border-bottom: 1px solid var(--border);
+        .new-chat {
+            background: #2b2c2f;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 12px;
+            border-radius: 24px;
+            font-weight: 500;
             display: flex;
             align-items: center;
-            padding: 0 16px;
-            justify-content: space-between;
-            z-index: 100;
-        }
-
-        .menu-items {
-            display: flex;
-            gap: 15px;
-            font-size: 11px;
-            color: var(--text-dim);
-        }
-
-        .menu-item {
+            gap: 10px;
             cursor: pointer;
-            transition: color 0.2s;
+            transition: background 0.2s;
         }
 
-        .menu-item:hover {
-            color: #fff;
+        .new-chat:hover {
+            background: #37393b;
+        }
+
+        .session-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .session-item {
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--text-dim);
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 4px;
+        }
+
+        .session-item:hover {
+            background: #2b2c2f;
+            color: var(--text-main);
+        }
+
+        .session-item.active {
+            background: #3c3d3f;
+            color: var(--accent);
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        header {
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
         }
 
         .logo {
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: var(--accent);
+            font-weight: 600;
+            font-size: 18px;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
         .logo span {
-            color: #fff;
-            font-weight: 300;
-        }
-
-        /* Layout Grid */
-        .main-layout {
-            flex: 1;
-            display: grid;
-            grid-template-columns: var(--sidebar-width) 1fr var(--lesson-width);
-            grid-template-rows: 1fr var(--terminal-height);
-            overflow: hidden;
-        }
-
-        /* Sidebar - Files */
-        .sidebar {
-            grid-row: 1 / span 2;
-            background: var(--bg-sidebar);
-            border-right: 1px solid var(--border);
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .sidebar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .new-file-btn {
-            background: var(--accent);
-            color: #000;
-            border: none;
-            border-radius: 4px;
-            width: 20px;
-            height: 20px;
-            font-size: 14px;
-            font-weight: 800;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .lang-select {
-            background: var(--bg-editor);
-            color: var(--text-dim);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            font-size: 10px;
-            padding: 2px 4px;
-            outline: none;
-            cursor: pointer;
-        }
-
-        .section-label {
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-dim);
-            font-weight: 700;
-        }
-
-        .file-list {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .file-item {
-            padding: 6px 10px;
-            border-radius: 4px;
-            font-size: 13px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            transition: background 0.2s;
-            color: var(--text-dim);
-        }
-
-        .file-item:hover {
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-main);
-        }
-
-        .file-item.active {
-            background: rgba(56, 189, 248, 0.1);
             color: var(--accent);
-            border-left: 2px solid var(--accent);
         }
 
-        /* Editor Area - Top Center */
-        .editor-container {
-            grid-column: 2;
-            grid-row: 1;
-            background: var(--bg-editor);
+        .controls {
             display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        .tabs-bar {
-            height: 35px;
-            background: rgba(0, 0, 0, 0.2);
-            display: flex;
-            align-items: center;
-            padding-left: 10px;
-        }
-
-        .tab {
-            padding: 0 16px;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            font-size: 12px;
-            border-right: 1px solid var(--border);
-            background: var(--bg-editor);
-            color: var(--text-dim);
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .tab:hover {
-            background: rgba(255, 255, 255, 0.02);
-        }
-
-        .editor-content {
-            flex: 1;
-            font-family: 'Fira Code', monospace;
-            padding: 20px;
-            font-size: 14px;
-            line-height: 1.6;
-            color: #d1d5db;
-            outline: none;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            position: relative;
-        }
-
-        .cursor {
-            display: inline-block;
-            width: 8px;
-            height: 18px;
-            background: var(--accent);
-            animation: blink 1s infinite;
-            vertical-align: middle;
-        }
-
-        @keyframes blink {
-
-            0%,
-            100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0;
-            }
-        }
-
-        /* Coding Lessons - Right */
-        .lessons-panel {
-            grid-column: 3;
-            grid-row: 1 / span 2;
-            background: var(--bg-sidebar);
-            border-left: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-        }
-
-        .lesson-card {
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 12px;
-            padding: 16px;
-            margin-top: 12px;
-            border: 1px solid var(--border);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .lesson-card:hover {
-            background: rgba(255, 255, 255, 0.05);
-            transform: translateY(-2px);
-        }
-
-        .lesson-card h4 {
-            color: var(--accent);
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-
-        .lesson-card p {
-            font-size: 13px;
-            color: var(--text-dim);
-            line-height: 1.5;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 10px;
-            background: rgba(16, 185, 129, 0.2);
-            color: #10b981;
-            margin-top: 10px;
-        }
-
-        /* Terminal - Bottom */
-        .terminal {
-            grid-column: 2;
-            grid-row: 2;
-            background: var(--bg-terminal);
-            border-top: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            padding: 12px;
-            font-family: 'Fira Code', monospace;
-            overflow: hidden;
-        }
-
-        .terminal-header {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 8px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            padding-bottom: 4px;
-        }
-
-        .terminal-tab {
-            font-size: 11px;
-            color: var(--text-dim);
-            text-transform: uppercase;
-            cursor: pointer;
-        }
-
-        .terminal-tab.active {
-            color: var(--accent);
-            border-bottom: 1px solid var(--accent);
-        }
-
-        .terminal-output {
-            flex: 1;
-            overflow-y: auto;
-            font-size: 12px;
-            padding: 8px 0;
-            display: flex;
-            flex-direction: column;
             gap: 12px;
         }
 
-        /* AI Message Box in Terminal */
-        .ai-response-box {
-            border: 1px solid var(--accent);
-            background: rgba(56, 189, 248, 0.05);
-            padding: 16px;
-            border-radius: 8px;
-            position: relative;
-            margin: 10px 0;
-            animation: slideUp 0.3s ease-out;
+        .btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: #2b2c2f;
+            color: var(--text-main);
+            transition: all 0.2s;
         }
 
-        .ai-response-box::before {
-            content: 'SOCRATIC COACH';
-            position: absolute;
-            top: -10px;
-            left: 12px;
-            background: var(--bg-terminal);
-            padding: 0 8px;
-            font-size: 10px;
-            color: var(--accent);
-            font-weight: 700;
+        .btn-run {
+            color: #81c995;
+            border-color: rgba(129, 201, 149, 0.3);
         }
 
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .btn-run:hover {
+            background: rgba(129, 201, 149, 0.1);
         }
 
-        .terminal-input-line {
+        .btn-debug {
+            color: #fdd663;
+            border-color: rgba(253, 214, 99, 0.3);
+        }
+
+        .btn-debug:hover {
+            background: rgba(253, 214, 99, 0.1);
+        }
+
+        /* Chat Area */
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px 15% 100px 15%;
             display: flex;
-            gap: 10px;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .msg {
+            display: flex;
+            gap: 20px;
+            max-width: 800px;
+            width: 100%;
+            align-self: center;
+        }
+
+        .msg-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
             align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
         }
 
-        .prompt {
-            color: #10b981;
+        .avatar-ai {
+            background: linear-gradient(45deg, #1a73e8, #d93025);
         }
 
-        .terminal-input {
+        .avatar-user {
+            background: #5f6368;
+        }
+
+        .msg-content {
+            flex: 1;
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--text-main);
+        }
+
+        .msg-ai-box {
+            background: rgba(138, 180, 248, 0.05);
+            border: 1px solid rgba(138, 180, 248, 0.2);
+            padding: 20px;
+            border-radius: 16px;
+        }
+
+        /* Code Editor Component */
+        .editor-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 20px 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .editor-header {
+            padding: 8px 16px;
+            background: #1e1f20;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .editor-title {
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        .editor-lang {
+            background: transparent;
+            color: var(--accent);
+            border: none;
+            font-size: 12px;
+            font-weight: 600;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .editor-content {
+            padding: 20px;
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            min-height: 200px;
+            outline: none;
+            color: #d1d5db;
+        }
+
+        /* Input Bar */
+        .input-area {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            max-width: 800px;
+            background: #1e1f20;
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .chat-input {
+            flex: 1;
             background: transparent;
             border: none;
             color: var(--text-main);
-            font-family: inherit;
-            font-size: inherit;
-            flex: 1;
+            font-size: 16px;
             outline: none;
         }
 
-        /* Scrollbar styling */
-        ::-webkit-scrollbar {
-            width: 4px;
+        .send-btn {
+            background: transparent;
+            border: none;
+            color: var(--accent);
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
         }
 
-        ::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--accent);
-        }
-
-        /* Modal Styles */
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -413,24 +295,38 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(4px);
         }
 
         .modal-content {
-            background-color: var(--bg-sidebar);
-            margin: 10% auto;
-            padding: 0;
+            background: var(--bg-sidebar);
+            margin: 15% auto;
+            width: 450px;
+            border-radius: 24px;
             border: 1px solid var(--accent);
-            width: 500px;
-            border-radius: 12px;
-            box-shadow: 0 0 30px var(--accent-glow);
-            animation: modalSlide 0.3s ease-out;
+            overflow: hidden;
+            box-shadow: 0 0 40px rgba(138, 180, 248, 0.2);
+            animation: slideUp 0.3s ease-out;
         }
 
-        @keyframes modalSlide {
+        .modal-header {
+            padding: 20px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .modal-body {
+            padding: 30px;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        @keyframes slideUp {
             from {
-                transform: translateY(-50px);
+                transform: translateY(20px);
                 opacity: 0;
             }
 
@@ -440,358 +336,224 @@
             }
         }
 
-        .modal-header {
-            padding: 15px 20px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 700;
-        }
-
-        .modal-body {
+        /* Stats */
+        .brain-stats {
+            position: fixed;
+            top: 100px;
+            right: 40px;
+            width: 200px;
+            background: var(--bg-sidebar);
             padding: 20px;
-            font-family: 'Fira Code', monospace;
-            font-size: 14px;
-            color: var(--text-main);
-            line-height: 1.6;
+            border-radius: 16px;
+            border: 1px solid var(--border);
         }
 
-        .close-modal {
+        .stat-label {
+            font-size: 12px;
             color: var(--text-dim);
-            font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
+            text-transform: uppercase;
+            margin-bottom: 8px;
         }
 
-        .close-modal:hover {
-            color: var(--accent);
+        .stat-bar {
+            height: 4px;
+            background: #3c3d3f;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .stat-fill {
+            background: var(--accent);
+            height: 100%;
+            width: 100%;
+            transition: width 0.5s;
         }
     </style>
 </head>
 
 <body>
 
-    <nav class="top-nav">
-        <div class="logo">🔒 Logic<span>Lock IDE</span></div>
-        <div class="menu-items">
-            <div class="menu-item" onclick="handleRun()" style="color: #10b981; font-weight: 600; font-size: 13px;">▶
-                Run</div>
-            <div class="menu-item" onclick="handleDebug()" style="color: #fbbf24; font-size: 13px;">🐞 Debug</div>
+    <aside>
+        <div class="new-chat" onclick="location.reload()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+            </svg>
+            New Session
         </div>
-        <div id="connection-status" class="status-badge"
-            style="background: rgba(56,189,248,0.2); color: var(--accent);">CONNECTED TO GEMINI</div>
-    </nav>
+        <div class="session-list">
+            <div class="stat-label">Learning Modules</div>
+            <div class="session-item active" onclick="loadModule('Binary Logic')">Binary Logic Mastery</div>
+            <div class="session-item" onclick="loadModule('Recursion')">Recursive Thinking</div>
+            <div class="session-item" onclick="loadModule('Loops')">Efficient Iteration</div>
+        </div>
+        <div style="font-size: 11px; color: var(--text-dim); text-align: center;">LogicLock IDE v2.0</div>
+    </aside>
 
-    <!-- Run Output Modal -->
+    <main>
+        <header>
+            <div class="logo">🔒 Logic<span>Lock</span> AI</div>
+            <div class="controls">
+                <button class="btn btn-debug" onclick="handleDebug()">Debug Session</button>
+                <button class="btn btn-run" onclick="handleRun()">Run Logic</button>
+            </div>
+        </header>
+
+        <div class="chat-container" id="chat-stream">
+            <!-- Initial Coach Message -->
+            <div class="msg">
+                <div class="msg-avatar avatar-ai">✨</div>
+                <div class="msg-content">
+                    <p>Welcome, Engineer. I'm your <b>Socratic Logic Coach</b>. I noticed you're starting a new logic
+                        module.</p>
+                    <div class="editor-card">
+                        <div class="editor-header">
+                            <div class="editor-title" id="file-name" ondblclick="renameFile()">main.js</div>
+                            <select class="editor-lang" id="lang-select" onchange="syncLang()">
+                                <option value="js">JavaScript</option>
+                                <option value="py">Python</option>
+                                <option value="cpp">C++</option>
+                            </select>
+                        </div>
+                        <div class="editor-content" id="editor" contenteditable="true" onpaste="handlePaste(event)">
+                            // Initialize your logic here...
+                            // (Try pasting code to see LogicLock in action)
+                        </div>
+                    </div>
+                    <div class="msg-ai-box">
+                        What is the first "brick" you want to place in your logic today? Describe your goal in plain
+                        words, and let's build it together.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="brain-stats">
+            <div class="stat-label">Originality Score</div>
+            <div style="font-size: 24px; font-weight: 700; margin-bottom: 10px;" id="power-val">100%</div>
+            <div class="stat-bar">
+                <div class="stat-fill" id="power-bar"></div>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <input type="text" class="chat-input" id="user-input" placeholder="Explain your logic..."
+                onkeypress="if(event.key==='Enter') sendMessage()">
+            <button class="send-btn" onclick="sendMessage()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                </svg>
+            </button>
+        </div>
+    </main>
+
+    <!-- Modal -->
     <div id="run-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <span style="color: #10b981;">▶ Execution Result</span>
-                <span class="close-modal" onclick="closeModal()">&times;</span>
+                <span>Execution Result</span>
+                <span style="cursor:pointer" onclick="closeModal()">✕</span>
             </div>
-            <div id="modal-body" class="modal-body">
-                <!-- Output text goes here -->
-            </div>
+            <div class="modal-body" id="modal-body"></div>
         </div>
     </div>
 
-    <div class="main-layout">
-        <!-- Sidebar: Files -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <div class="section-label">Explorer</div>
-                <button class="new-file-btn" onclick="createNewFile()" title="New File">+</button>
-            </div>
-
-            <div style="margin-top: 8px;">
-                <div class="section-label" style="font-size: 8px; margin-bottom: 4px;">Language</div>
-                <select class="lang-select" id="lang-select" onchange="handleLangChange()">
-                    <option value="js">JavaScript (.js)</option>
-                    <option value="ts">TypeScript (.ts)</option>
-                    <option value="py">Python (.py)</option>
-                    <option value="cpp">C++ (.cpp)</option>
-                    <option value="html">HTML (.html)</option>
-                </select>
-            </div>
-
-            <ul class="file-list" id="file-list" style="margin-top: 10px;">
-                <li class="file-item active" onclick="selectFile('main.js')">📄 main.js</li>
-                <li class="file-item" onclick="selectFile('logic.ts')">ts logic.ts</li>
-                <li class="file-item" onclick="selectFile('styles.css')"># styles.css</li>
-            </ul>
-        </aside>
-
-        <!-- Editor: Top Center -->
-        <section class="editor-container">
-            <div class="tabs-bar">
-                <div class="tab" id="active-tab" ondblclick="renameActiveFile()">main.js ✕</div>
-            </div>
-            <div class="editor-content" id="editor" contenteditable="true" onpaste="handlePaste(event)">
-                <span style="color:#6366f1">function</span> <span style="color:#38bdf8">initCoreModule</span>() {
-                <span style="color:#4b5563">// Starting learning session...</span>
-                <span style="color:#fbbf24">console</span>.<span style="color:#38bdf8">log</span>(<span
-                    style="color:#10b981">"Ready for input"</span>);
-                }
-
-                <span style="color:#4b5563">// Try pasting your code here to trigger LogicLock!</span>
-                <span class="cursor"></span>
-            </div>
-        </section>
-
-        <!-- Terminal: Bottom Center -->
-        <section class="terminal">
-            <div class="terminal-header">
-                <div class="terminal-tab active">Terminal</div>
-                <div class="terminal-tab">Output</div>
-                <div class="terminal-tab">Debug Console</div>
-                <div class="terminal-tab">Problems</div>
-            </div>
-            <div class="terminal-output" id="terminal-output">
-                <div>[System] LogicLock v1.0.0 initialized.</div>
-                <div>[System] Socratic Coach standing by...</div>
-            </div>
-            <div class="terminal-input-line">
-                <span class="prompt">➜</span>
-                <input type="text" id="terminal-input" class="terminal-input"
-                    placeholder="Type your response to the coach..." onkeypress="handleCommand(event)">
-            </div>
-        </section>
-
-        <!-- Lessons: Right Side -->
-        <aside class="lessons-panel">
-            <div class="section-label">Coding Training Modules</div>
-
-            <div class="lesson-card clickable"
-                onclick="loadLesson('Binary Logic', 'Binary Search helps you find elements in a sorted array by dividing work in half. Try implementing it in main.js.')">
-                <h4>1. Binary Logic Mastery</h4>
-                <p>Divide and conquer algorithms without copying code.</p>
-                <div class="status-badge" id="binary-status">Ready</div>
-            </div>
-
-            <div class="lesson-card clickable"
-                onclick="loadLesson('Recursive Thinking', 'Recursion is a function calling itself. Master it through visual analogies, not templates.')">
-                <h4>2. Recursive Thinking</h4>
-                <p>Learn the 'Descending Ladder' approach to functions.</p>
-                <div class="status-badge" style="background: rgba(251, 191, 36, 0.2); color: #fbbf24;">In Progress</div>
-            </div>
-
-            <div class="lesson-card clickable"
-                onclick="loadLesson('Data Structures', 'Learn why Arrays and Objects are like Drawers and Maps.')">
-                <h4>3. Data Structures v1</h4>
-                <p>Visualizing data storage for better logic.</p>
-                <div class="status-badge" style="background: rgba(148, 163, 184, 0.2); color: #94a3b8;">Locked</div>
-            </div>
-
-            <div style="flex:1"></div>
-
-            <div class="section-label">Socratic Session Stats</div>
-            <div style="font-size: 12px; margin-top: 10px;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                    <span>Brain Power (Originality)</span>
-                    <span id="brain-power" style="color: var(--accent);">100%</span>
-                </div>
-                <div style="height:4px; background:rgba(255,255,255,0.05); border-radius:2px;">
-                    <div id="brain-bar"
-                        style="width:100%; height:100%; background: var(--accent); transition: width 0.5s;"></div>
-                </div>
-                <p style="font-size: 10px; color: var(--text-dim); margin-top: 8px;">*Originality decreases when copying
-                    from external sources.</p>
-            </div>
-        </aside>
-    </div>
-
     <script>
-        const terminalOutput = document.getElementById('terminal-output');
-        const terminalInput = document.getElementById('terminal-input');
+        const chatStream = document.getElementById('chat-stream');
+        const userInput = document.getElementById('user-input');
         const editor = document.getElementById('editor');
-        const brainPowerVal = document.getElementById('brain-power');
-        const brainBar = document.getElementById('brain-bar');
+        const powerVal = document.getElementById('power-val');
+        const powerBar = document.getElementById('power-bar');
 
-        let currentBrainPower = 100;
+        let brainPower = 100;
 
-        function updateBrainPower(change) {
-            currentBrainPower = Math.max(0, Math.min(100, currentBrainPower + change));
-            brainPowerVal.textContent = `${currentBrainPower}%`;
-            brainBar.style.width = `${currentBrainPower}%`;
+        function updatePower(change) {
+            brainPower = Math.max(0, Math.min(100, brainPower + change));
+            powerVal.textContent = `${brainPower}%`;
+            powerBar.style.width = `${brainPower}%`;
         }
 
-        function addTerminalLine(text, isAi = false) {
-            const div = document.createElement('div');
-            if (isAi) {
-                div.className = 'ai-response-box';
-                div.innerHTML = text;
-            } else {
-                div.innerHTML = text;
-            }
-            terminalOutput.appendChild(div);
-            terminalOutput.scrollTop = terminalOutput.scrollHeight;
+        function createMessage(role, text, isBoxed = false) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'msg';
+
+            const avatar = role === 'ai' ? '✨' : '👤';
+            const avatarClass = role === 'ai' ? 'avatar-ai' : 'avatar-user';
+            const contentClass = isBoxed ? 'msg-ai-box' : '';
+
+            msgDiv.innerHTML = `
+                <div class="msg-avatar ${avatarClass}">${avatar}</div>
+                <div class="msg-content">
+                    <div class="${contentClass}">${text}</div>
+                </div>
+            `;
+            chatStream.appendChild(msgDiv);
+            chatStream.scrollTop = chatStream.scrollHeight;
+        }
+
+        function sendMessage() {
+            const text = userInput.value;
+            if (!text) return;
+
+            createMessage('user', text);
+            userInput.value = '';
+            updatePower(5);
+
+            setTimeout(() => {
+                const lang = document.getElementById('lang-select').value;
+                const response = `That's an insightful approach for <b>${lang.toUpperCase()}</b>. If you had to explain this step to someone who doesn't know what a computer is, what real-world analogy would you use?`;
+                createMessage('ai', response, true);
+            }, 800);
         }
 
         function handlePaste(e) {
             e.preventDefault();
             const text = e.clipboardData.getData('text');
-
-            if (text.length > 50 || text.split('\n').length > 3) {
-                updateBrainPower(-20);
-                addTerminalLine(`<span style="color:#ef4444">[LogicLock] 🚨 HIGH-VELOCITY PASTE DETECTED!</span> Blocked the injection to protect your learning.`);
-                setTimeout(() => {
-                    addTerminalLine(`
-                        "I noticed you're trying to inject a large block of code. Instead of shortcuts, let's think: 
-                        If you're building a tower, do you drop a pre-made floor or place each brick to understand 
-                        the weight? What is the first 'brick' of your logic here?"
-                    `, true);
-                    terminalInput.focus();
-                }, 800);
+            if (text.length > 50) {
+                updatePower(-20);
+                createMessage('ai', `<span style="color:#f28b82"><b>🚨 LOGIC LOCK TRIGGERED</b></span><br>High-velocity paste detected. I've blocked the injection to protect your learning session. Let's break down the logic manually instead.`, true);
             }
         }
 
-        function handleLangChange() {
+        function syncLang() {
             const lang = document.getElementById('lang-select').value;
-            const tab = document.getElementById('active-tab');
-            const currentName = tab.textContent.split(' ')[0];
-            const nameWithoutExt = currentName.split('.')[0];
-
-            const newName = `${nameWithoutExt}.${lang}`;
-            tab.innerHTML = `${newName} ✕`;
-
-            const activeFileItem = document.querySelector('.file-item.active');
-            if (activeFileItem) {
-                activeFileItem.innerHTML = `📄 ${newName}`;
-                activeFileItem.setAttribute('onclick', `selectFile('${newName}')`);
-            }
-
-            addTerminalLine(`[System] Environment synced. Language set to: ${lang.toUpperCase()}`);
+            const fileName = document.getElementById('file-name');
+            const currentName = fileName.textContent.split('.')[0];
+            fileName.textContent = `${currentName}.${lang}`;
+            createMessage('ai', `I've synced the environment to <b>${lang.toUpperCase()}</b>. Ready to proceed?`, true);
         }
 
-        function createNewFile() {
-            const name = prompt("Enter file name:", "untitled");
-            if (name) {
-                const lang = document.getElementById('lang-select').value;
-                const fullName = name.includes('.') ? name : `${name}.${lang}`;
-
-                const list = document.getElementById('file-list');
-                const li = document.createElement('li');
-                li.className = 'file-item';
-                li.innerHTML = `📄 ${fullName}`;
-                li.onclick = function () { selectFile(fullName); };
-                list.appendChild(li);
-
-                selectFile(fullName);
-                addTerminalLine(`[System] Created new file: ${fullName}`);
-            }
-        }
-
-        function renameActiveFile() {
-            const tab = document.getElementById('active-tab');
-            const oldName = tab.textContent.split(' ')[0];
-            const newName = prompt("Rename file to:", oldName);
-
-            if (newName && newName !== oldName) {
-                tab.innerHTML = `${newName} ✕`;
-                const activeFileItem = document.querySelector('.file-item.active');
-                if (activeFileItem) {
-                    activeFileItem.innerHTML = `📄 ${newName}`;
-                }
-                addTerminalLine(`[System] Renamed file to: ${newName}`);
-            }
-        }
-
-        function selectFile(name) {
-            const items = document.querySelectorAll('.file-item');
-            items.forEach(i => i.classList.remove('active'));
-
-            const allItems = document.querySelectorAll('.file-item');
-            allItems.forEach(item => {
-                if (item.textContent.includes(name)) item.classList.add('active');
-            });
-
-            document.getElementById('active-tab').innerHTML = `${name} ✕`;
-            addTerminalLine(`[System] Switched to editor: ${name}`);
-        }
-
-        function handleCommand(e) {
-            if (e.key === 'Enter') {
-                const cmd = terminalInput.value;
-                if (!cmd) return;
-
-                const codeContext = editor.innerText;
-                const lang = document.getElementById('lang-select').value;
-                const activeFile = document.getElementById('active-tab').innerText.split(' ')[0];
-
-                addTerminalLine(`<span class="prompt">➜</span> ${cmd}`);
-                terminalInput.value = '';
-                updateBrainPower(5);
-
-                setTimeout(() => {
-                    let response = "";
-                    const lowerCmd = cmd.toLowerCase();
-
-                    if (lowerCmd.includes('help') || lowerCmd.includes('stuck')) {
-                        response = `I see you're working in <b>${activeFile}</b>. Looking at your logic, you've started with some core structures. If you had to explain the main goal of this ${lang.toUpperCase()} code using only basic tools like a calculator or a scale, how would it work?`;
-                    } else if (lowerCmd.includes('explain') || lowerCmd.includes('how')) {
-                        if (codeContext.includes('function')) {
-                            response = "Functions are like machines in a factory. You put something in (input), and something else comes out (output). What are the 'raw materials' your current function is expecting?";
-                        } else {
-                            response = "Think of your logic like a recipe. If we don't define the ingredients first, the oven doesn't know what to bake. What is the very first piece of data your code needs to handle?";
-                        }
-                    } else if (lowerCmd.includes('error') || lowerCmd.includes('debug')) {
-                        response = "Errors are just the computer's way of saying 'I don't understand this specific step.' Look at your most recent line. If you were the computer, what would be the most confusing part of that instruction?";
-                    } else {
-                        response = `That's a solid thought. Integrating that into your <b>${lang.toUpperCase()}</b> logic: How does this step move us closer to the final output without using a pre-made library?`;
-                    }
-
-                    addTerminalLine(response, true);
-                }, 1000);
-            }
+        function renameFile() {
+            const fileName = document.getElementById('file-name');
+            const current = fileName.textContent;
+            const next = prompt("Rename session file:", current);
+            if (next) fileName.textContent = next;
         }
 
         function handleRun() {
             const modal = document.getElementById('run-modal');
             const body = document.getElementById('modal-body');
             modal.style.display = 'block';
-            body.innerHTML = `<div style="color:var(--text-dim)">[System] Compiling...</div><div class="cursor"></div>`;
-
-            setTimeout(() => {
-                body.innerHTML = `
-                    <div style="color:#10b981; margin-bottom:10px;">> Execution Successful</div>
-                    <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:4px; border-left:4px solid var(--accent);">
-                        Hello from LogicLock IDE!<br><br>
-                        Socratic Session: ACTIVE<br>
-                        Brain Power: ${currentBrainPower}%<br>
-                        Analysis: Your logic structure is verified.
-                    </div>
-                `;
-                addTerminalLine(`[System] Executed successfully. Results shown in popup.`, true);
-            }, 1000);
-        }
-
-        function closeModal() {
-            document.getElementById('run-modal').style.display = 'none';
-        }
-
-        window.onclick = function (event) {
-            const modal = document.getElementById('run-modal');
-            if (event.target == modal) {
-                modal.style.display = 'none';
-            }
+            body.innerHTML = `
+                <div style="color:#81c995"><b>✓ Logic Verified</b></div>
+                <div style="margin-top:15px; background:rgba(255,255,255,0.05); padding:15px; border-radius:8px;">
+                    Environment: Socratic Logic Engine<br>
+                    Originality Score: ${brainPower}%<br><br>
+                    Analysis: Your core understanding of the algorithm flow is solid. We recommend moving to the next module.
+                </div>
+            `;
         }
 
         function handleDebug() {
-            addTerminalLine(`[Debug] Breakpoint hit. Inspecting logic stack...`);
-            addTerminalLine(`[Coach] I see a loop here. Instead of checking the result, tell me: what is the condition that makes this loop stop?`, true);
+            createMessage('ai', `Analyzing logic stack traces... I see your current structure. Before we look at the values, <b>what is the primary exit condition</b> for your logic?`, true);
         }
 
-        function loadLesson(title, content) {
-            addTerminalLine(`[System] Loading Module: ${title}...`);
-            setTimeout(() => {
-                addTerminalLine(`
-                    <strong>NEW MODULE LOADED: ${title}</strong><br>
-                    ${content}<br><br>
-                    Goal: Write the logic in main.js. Avoid pasting!
-                `, true);
-            }, 500);
+        function closeModal() { document.getElementById('run-modal').style.display = 'none'; }
+
+        function loadModule(name) {
+            createMessage('ai', `Loading <b>${name}</b> module. The environment is now set up for this challenge.`, true);
         }
+
+        window.onclick = function (e) { if (e.target.className === 'modal') closeModal(); }
     </script>
 </body>
 
