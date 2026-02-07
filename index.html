@@ -335,39 +335,6 @@
                 opacity: 1;
             }
         }
-
-        /* Stats */
-        .brain-stats {
-            position: fixed;
-            top: 100px;
-            right: 40px;
-            width: 200px;
-            background: var(--bg-sidebar);
-            padding: 20px;
-            border-radius: 16px;
-            border: 1px solid var(--border);
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: var(--text-dim);
-            text-transform: uppercase;
-            margin-bottom: 8px;
-        }
-
-        .stat-bar {
-            height: 4px;
-            background: #3c3d3f;
-            border-radius: 2px;
-            overflow: hidden;
-        }
-
-        .stat-fill {
-            background: var(--accent);
-            height: 100%;
-            width: 100%;
-            transition: width 0.5s;
-        }
     </style>
 </head>
 
@@ -427,14 +394,6 @@
             </div>
         </div>
 
-        <div class="brain-stats">
-            <div class="stat-label">Originality Score</div>
-            <div style="font-size: 24px; font-weight: 700; margin-bottom: 10px;" id="power-val">100%</div>
-            <div class="stat-bar">
-                <div class="stat-fill" id="power-bar"></div>
-            </div>
-        </div>
-
         <div class="input-area">
             <input type="text" class="chat-input" id="user-input" placeholder="Explain your logic..."
                 onkeypress="if(event.key==='Enter') sendMessage()">
@@ -461,16 +420,6 @@
         const chatStream = document.getElementById('chat-stream');
         const userInput = document.getElementById('user-input');
         const editor = document.getElementById('editor');
-        const powerVal = document.getElementById('power-val');
-        const powerBar = document.getElementById('power-bar');
-
-        let brainPower = 100;
-
-        function updatePower(change) {
-            brainPower = Math.max(0, Math.min(100, brainPower + change));
-            powerVal.textContent = `${brainPower}%`;
-            powerBar.style.width = `${brainPower}%`;
-        }
 
         function createMessage(role, text, isBoxed = false) {
             const msgDiv = document.createElement('div');
@@ -496,7 +445,6 @@
 
             createMessage('user', text);
             userInput.value = '';
-            updatePower(5);
 
             setTimeout(() => {
                 const lang = document.getElementById('lang-select').value;
@@ -509,7 +457,6 @@
             e.preventDefault();
             const text = e.clipboardData.getData('text');
             if (text.length > 50) {
-                updatePower(-20);
                 createMessage('ai', `<span style="color:#f28b82"><b>🚨 LOGIC LOCK TRIGGERED</b></span><br>High-velocity paste detected. I've blocked the injection to protect your learning session. Let's break down the logic manually instead.`, true);
             }
         }
@@ -536,8 +483,7 @@
             body.innerHTML = `
                 <div style="color:#81c995"><b>✓ Logic Verified</b></div>
                 <div style="margin-top:15px; background:rgba(255,255,255,0.05); padding:15px; border-radius:8px;">
-                    Environment: Socratic Logic Engine<br>
-                    Originality Score: ${brainPower}%<br><br>
+                    Environment: Socratic Logic Engine<br><br>
                     Analysis: Your core understanding of the algorithm flow is solid. We recommend moving to the next module.
                 </div>
             `;
