@@ -44,15 +44,20 @@
         }
 
         /* Top Bar */
-        .top-nav {
-            height: var(--header-height);
-            background: var(--bg-sidebar);
-            border-bottom: 1px solid var(--border);
+        .menu-items {
             display: flex;
-            align-items: center;
-            padding: 0 16px;
-            justify-content: space-between;
-            z-index: 100;
+            gap: 15px;
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        .menu-item {
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .menu-item:hover {
+            color: #fff;
         }
 
         .logo {
@@ -349,8 +354,17 @@
 
     <nav class="top-nav">
         <div class="logo">🔒 Logic<span>Lock IDE</span></div>
-        <div style="font-size: 11px; color: var(--text-dim);">File &nbsp; Edit &nbsp; Selection &nbsp; View &nbsp; Go
-            &nbsp; Run &nbsp; Terminal &nbsp; Help</div>
+        <div class="menu-items">
+            <div class="menu-item">File</div>
+            <div class="menu-item">Edit</div>
+            <div class="menu-item">Selection</div>
+            <div class="menu-item">View</div>
+            <div class="menu-item">Go</div>
+            <div class="menu-item" onclick="handleRun()" style="color: #10b981; font-weight: 600;">▶ Run</div>
+            <div class="menu-item" onclick="handleDebug()" style="color: #fbbf24;">🐞 Debug</div>
+            <div class="menu-item" onclick="handleBuild()">🛠️ Build</div>
+            <div class="menu-item">Help</div>
+        </div>
         <div id="connection-status" class="status-badge"
             style="background: rgba(56,189,248,0.2); color: var(--accent);">CONNECTED TO GEMINI</div>
     </nav>
@@ -497,11 +511,29 @@
             }
         }
 
-        function selectFile(name) {
-            const items = document.querySelectorAll('.file-item');
-            items.forEach(i => i.classList.remove('active'));
-            event.currentTarget.classList.add('active');
-            addTerminalLine(`[System] Switched to editor: ${name}`);
+        function handleRun() {
+            addTerminalLine(`[System] Initializing execution for main.js...`);
+            setTimeout(() => {
+                addTerminalLine(`[System] Executing build artifacts...`);
+                setTimeout(() => {
+                    addTerminalLine(`[Output] Hello from LogicLock IDE! Socratic Session is active.`);
+                    addTerminalLine(`[LogicLock] 🔒 Analysis: Your code logic is 100% original. Good work.`, true);
+                }, 1000);
+            }, 500);
+        }
+
+        function handleDebug() {
+            addTerminalLine(`[Debug] Launching debugger on port 9229...`);
+            addTerminalLine(`[Debug] Breakpoint hit at main.js:14`);
+            addTerminalLine(`[Coach] I see you're stepping through the code. Instead of just looking at the variable value, think: what event *caused* that number to change?`, true);
+        }
+
+        function handleBuild() {
+            addTerminalLine(`[Build] Compiling TypeScript components...`);
+            setTimeout(() => {
+                addTerminalLine(`[Build] LogicLock: Pre-processing paste-velocity guards...`);
+                addTerminalLine(`[Build] Build SUCCESSFUL. ⚡`);
+            }, 1200);
         }
     </script>
 </body>
