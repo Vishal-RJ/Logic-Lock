@@ -1,0 +1,94 @@
+{
+  "name": "logiclock-ide",
+  "displayName": "LogicLock IDE",
+  "description": "An educational VS Code extension that prevents copy-paste learning and provides Socratic coaching.",
+  "version": "0.1.0",
+  "publisher": "logiclock",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Education",
+    "Programming Languages"
+  ],
+  "main": "./out/extension.js",
+  "bin": {
+    "logiclock": "./out/cli.js"
+  },
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "logiclock-sidebar",
+          "title": "LogicLock",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "logiclock-sidebar": [
+        {
+          "type": "webview",
+          "id": "logiclock.socraticView",
+          "name": "Socratic Coach"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "logiclock.startSocraticChat",
+        "title": "LogicLock: Start Socratic Chat"
+      }
+    ],
+    "configuration": {
+      "title": "LogicLock IDE",
+      "properties": {
+        "logiclock.geminiApiKey": {
+          "type": "string",
+          "default": "",
+          "description": "Google Gemini API Key for Socratic Coach (get one from https://aistudio.google.com)",
+          "scope": "application"
+        },
+        "logiclock.ollamaEndpoint": {
+          "type": "string",
+          "default": "http://localhost:11434",
+          "description": "Ollama endpoint for offline fallback mode",
+          "scope": "application"
+        },
+        "logiclock.ollamaModel": {
+          "type": "string",
+          "default": "gemma:2b",
+          "description": "Ollama model to use for offline mode",
+          "scope": "application"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.80.0",
+    "@types/node": "20.x",
+    "@types/fs-extra": "^11.0.1",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.45.0",
+    "typescript": "^5.1.6",
+    "@vscode/test-electron": "^2.3.3"
+  },
+  "dependencies": {
+    "axios": "^1.4.0",
+    "commander": "^11.0.0",
+    "fs-extra": "^11.1.1",
+    "@google/generative-ai": "^0.1.0"
+  }
+}

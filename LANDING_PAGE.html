@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogicLock IDE | Socratic Coaching for Developers</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #020617;
+            --surface: #0f172a;
+            --accent: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.4);
+            --text: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Hero Section */
+        header {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            text-align: center;
+            background: radial-gradient(circle at center, #1e293b 0%, var(--bg) 70%);
+            position: relative;
+        }
+
+        .hero-glow {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: var(--accent);
+            filter: blur(150px);
+            opacity: 0.15;
+            z-index: 0;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            letter-spacing: -1px;
+            z-index: 1;
+        }
+
+        .logo span {
+            color: var(--accent);
+            text-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .tagline {
+            font-size: 1.5rem;
+            color: var(--text-dim);
+            max-width: 600px;
+            margin-bottom: 2.5rem;
+            z-index: 1;
+        }
+
+        .cta-group {
+            display: flex;
+            gap: 1rem;
+            z-index: 1;
+        }
+
+        .btn {
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: var(--bg);
+            box-shadow: 0 10px 25px -10px var(--accent);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px -10px var(--accent);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+        }
+
+        .btn-outline:hover {
+            background: rgba(56, 189, 248, 0.1);
+            transform: translateY(-3px);
+        }
+
+        /* Features */
+        .features {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background: var(--surface);
+            padding: 2.5rem;
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent);
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+
+        .card p {
+            color: var(--text-dim);
+        }
+
+        /* Demo Section */
+        .demo-container {
+            padding: 5rem 2rem;
+            background: rgba(15, 23, 42, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .demo-title {
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        .mock-ide {
+            width: 100%;
+            max-width: 900px;
+            height: 500px;
+            background: #1e293b;
+            border-radius: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            display: flex;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .ide-sidebar {
+            width: 300px;
+            background: #0f172a;
+            border-right: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+        }
+
+        .ide-editor {
+            flex: 1;
+            padding: 2rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            color: #94a3b8;
+            position: relative;
+        }
+
+        .chat-bubble {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            font-size: 13px;
+            animation: slideIn 0.3s ease-out;
+            backdrop-filter: blur(5px);
+        }
+
+        .chat-role {
+            font-weight: 800;
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 4px;
+        }
+
+        .paste-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #ef4444;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
+            display: none;
+            z-index: 10;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        footer {
+            padding: 4rem 2rem;
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            color: var(--text-dim);
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .mock-ide { flex-direction: column; height: auto; }
+            .ide-sidebar { width: 100%; height: 300px; }
+            .logo { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="hero-glow"></div>
+        <h1 class="logo">Logic<span>Lock</span> IDE</h1>
+        <p class="tagline">The first VS Code extension that blocks copy-paste learning to build true engineering logic through Socratic Coaching.</p>
+        <div class="cta-group">
+            <a href="#demo" class="btn btn-primary" onclick="startDemo()">Live Experience</a>
+            <a href="https://github.com/Vishal-RJ/logiclock-ide" class="btn btn-outline">View Repository</a>
+        </div>
+    </header>
+
+    <section class="features">
+        <div class="card">
+            <h3>🔒 Paste Interception</h3>
+            <p>Monitors buffer velocity. If you paste more than 5 lines or complex logic, it auto-undos and triggers the Coach.</p>
+        </div>
+        <div class="card">
+            <h3>🧘 Socratic Coaching</h3>
+            <p>Integrated Gemini AI that refuses to give code. It uses analogies and guided questions to help you find the solution yourself.</p>
+        </div>
+        <div class="card">
+            <h3>🌩️ Offline First</h3>
+            <p>No internet? No problem. LogicLock falls back to local Ollama (Gemma 2B) to keep you learning anywhere.</p>
+        </div>
+    </section>
+
+    <section class="demo-container" id="demo">
+        <h2 class="demo-title">Interact with the LogicLock Coach</h2>
+        
+        <div class="mock-ide">
+            <div class="ide-sidebar">
+                <div style="font-weight:600; font-size:14px; margin-bottom:1rem; color:var(--accent);">LogicLock Coach</div>
+                <div id="chat-box" style="flex:1; overflow-y:auto; padding-right:5px;">
+                    <div class="chat-bubble">
+                        <div class="chat-role">System</div>
+                        Ready to learn? Try to paste some code in the editor on the right.
+                    </div>
+                </div>
+                <div style="display:flex; gap:5px; margin-top:1rem;">
+                    <input type="text" id="user-input" placeholder="Ask coach..." style="flex:1; background:#1e293b; border:1px solid rgba(255,255,255,0.1); border-radius:4px; color:white; padding:5px; font-size:12px; outline:none;">
+                    <button onclick="handleSend()" style="background:var(--accent); border:none; padding:5px 10px; border-radius:4px; font-weight:600; cursor:pointer; font-size:12px;">Ask</button>
+                </div>
+            </div>
+            <div class="ide-editor" id="editor">
+                <div class="paste-overlay" id="paste-msg">🚨 BLOCKED: PASTE VELOCITY TOO HIGH</div>
+                <div style="color:#4b5563;">// Type or paste code here...</div>
+                <div id="editor-text"></div>
+            </div>
+        </div>
+        <p style="margin-top: 2rem; color:var(--text-dim);">The "MVP Link" for your submission. This page proves the logic and UX of the product.</p>
+    </section>
+
+    <footer>
+        <p>Built for the IEEE YESIST12 Hackathon | LogicLock &copy; 2026</p>
+    </footer>
+
+    <script>
+        const chatBox = document.getElementById('chat-box');
+        const editor = document.getElementById('editor');
+        const pasteMsg = document.getElementById('paste-msg');
+
+        function addMessage(role, text) {
+            const div = document.createElement('div');
+            div.className = 'chat-bubble';
+            div.innerHTML = `<div class="chat-role">${role}</div>${text}`;
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function startDemo() {
+            setTimeout(() => {
+                pasteMsg.style.display = 'block';
+                setTimeout(() => {
+                    pasteMsg.style.display = 'none';
+                    addMessage('Coach', "I noticed you were trying to paste a large block of code! 🚨 <br><br>Instead of taking the shortcut, let's think: what is the core problem that code was supposed to solve?");
+                }, 2000);
+            }, 1000);
+        }
+
+        function handleSend() {
+            const input = document.getElementById('user-input');
+            const val = input.value;
+            if(!val) return;
+
+            addMessage('You', val);
+            input.value = '';
+
+            // Simulated Socratic Response
+            setTimeout(() => {
+                if(val.toLowerCase().includes('search')) {
+                    addMessage('Coach', "Interesting! Think of a dictionary. If you want to find 'Yellow', do you start at page 1, or jump to the middle? Why?");
+                } else {
+                    addMessage('Coach', "Think of it like a recipe. If we skip the steps and just look at the finished cake, we won't know how the heat changed the dough. What's the first 'ingredient' of your logic?");
+                }
+            }, 1000);
+        }
+
+        // Listen for paste event simulation
+        window.addEventListener('keydown', (e) => {
+            if((e.ctrlKey || e.metaKey) && e.key === 'v') {
+                startDemo();
+            }
+        });
+    </script>
+</body>
+</html>
